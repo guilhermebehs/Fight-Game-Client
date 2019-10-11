@@ -132,13 +132,13 @@ public class GamePanel extends javax.swing.JFrame {
             type = GameProtocolActionType.MOVE_DOWN;
         }
         
-        actionMng.sendAction(player.x, player.y, type);
+        actionMng.sendAction(player.getX(), player.getY(), type);
 
     }//GEN-LAST:event_formKeyPressed
 
     private void formKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
  
-        actionMng.sendAction(player.x, player.y, GameProtocolActionType.STAND);
+        actionMng.sendAction(player.getX(), player.getY(), GameProtocolActionType.STAND);
     }//GEN-LAST:event_formKeyReleased
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
@@ -152,7 +152,6 @@ public class GamePanel extends javax.swing.JFrame {
         getContentPane().remove(jPorta);
         getContentPane().remove(bConectar);
         player = new Player();
-        player.setup();
         player.grabFocus();
         actionMng = new ActionManagement(jHost.getText(), Integer.parseInt(jPorta.getText()), player, jPlacar,getContentPane());
         actionMng.iniciar();

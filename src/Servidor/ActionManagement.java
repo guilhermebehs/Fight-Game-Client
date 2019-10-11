@@ -45,9 +45,9 @@ public class ActionManagement implements Runnable {
             this.content = content;
             this.placar = placar;
             String id = in.readLine().split(":")[1];
-            player.id = Integer.parseInt(id);
+            player.setId(Integer.parseInt(id));
             otherPlayers.add(player);
-            sendAction(player.x, player.y, GameProtocolActionType.STAND);
+            sendAction(player.getX(), player.getY(), GameProtocolActionType.STAND);
             refreshScore();
         } catch (Exception e) {
             e.printStackTrace();
@@ -55,7 +55,7 @@ public class ActionManagement implements Runnable {
     }
     
     public void sendAction (int x, int y, GameProtocolActionType actionType){
-        GameProtocol prot = new GameProtocol(player.id,x,y,actionType);
+        GameProtocol prot = new GameProtocol(player.getId(),x,y,actionType);
         String protStr = prot.toString();
         out.println(protStr);
         out.flush();
@@ -67,7 +67,7 @@ public class ActionManagement implements Runnable {
             while((msg = in.readLine()) != null){
                 
                if(msg.equals("newPlayerAlert")){
-                  sendAction(player.x, player.y, player.lastAction); 
+                  sendAction(player.getX(), player.getY(), player.getLastAction()); 
                } 
                else{
                boolean encontrouPlayer = false;
@@ -79,7 +79,7 @@ public class ActionManagement implements Runnable {
                GameProtocolActionType action = GameProtocolActionType.valueOf(protArray[3]);
                GameProtocol prot = new GameProtocol(id,x,y, action);
                for(Player player: otherPlayers){
-                   if(player.id == prot.getId()){
+                   if(player.getId() == prot.getId()){
                      encontrouPlayer = true;  
                      if(action == GameProtocolActionType.MOVE_UP){
                    
@@ -108,7 +108,7 @@ public class ActionManagement implements Runnable {
             }
              if(!encontrouPlayer){
                  Player newPlayer = new Player();
-                 newPlayer.id = prot.getId();
+                 newPlayer.setId(prot.getId());
                  newPlayer.setup(prot.getX(), prot.getY());
                  otherPlayers.add(newPlayer);
                  content.add(newPlayer);
@@ -129,7 +129,7 @@ public class ActionManagement implements Runnable {
     public void restoreFromPunch(Player player){
         
           for(Player p: otherPlayers){
-             if(p.idPlayerPunch == player.id){
+             if(p.getIdPlayerPunch() == player.getId()){
                 p.stand();
              }
                
@@ -141,19 +141,19 @@ public class ActionManagement implements Runnable {
     public void validatePunch(Player player){
      
          for(Player p: otherPlayers){
-             if(p.id != player.id){
-                 int x1 = p.x;
-                 int x2 = player.x;
-                 int y1 = p.y;
-                 int y2 = player.y;
+             if(p.getId() != player.getId()){
+                 int x1 = p.getX();
+                 int x2 = player.getX();
+                 int y1 = p.getY();
+                 int y2 = player.getY();
                  int diferencaX = x1 - x2;
                  int diferencaY = y1 - y2;
                  diferencaX = diferencaX < 0? (diferencaX * -1) : diferencaX;
                  diferencaY = diferencaY < 0? (diferencaY * -1) : diferencaY;
                  
                  if(diferencaX < 30 && diferencaY < 30){
-                    player.points++;
-                    p.punched(player.id);
+                    player.setPoints(player.getPoints() + 1);
+                    p.punched(player.getId());
                     refreshScore();
                  }
                  
@@ -174,7 +174,7 @@ public class ActionManagement implements Runnable {
        model.addColumn("Player");
        model.addColumn("Pontuação");
         for(Player p: otherPlayers){
-            model.addRow(new Object[]{p.id,p.points});
+            model.addRow(new Object[]{p.getId(), p.getPoints()});
          }
         placar.setModel(model);
         placar.setFocusable(false);
