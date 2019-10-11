@@ -1,8 +1,10 @@
 package Tela;
 
+
 import Servidor.ActionManagement;
 import Servidor.GameProtocolActionType;
 import java.awt.event.KeyEvent;
+
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -16,9 +18,8 @@ import java.awt.event.KeyEvent;
 public class GamePanel extends javax.swing.JFrame {
 
     Player player;
-    Player player2;
     ActionManagement actionMng;
-    PlacarUpdate placar;
+    
     GameProtocolActionType lastAction;
 
     /**
@@ -40,7 +41,8 @@ public class GamePanel extends javax.swing.JFrame {
         jHost = new javax.swing.JTextField();
         jPorta = new javax.swing.JTextField();
         bConectar = new javax.swing.JButton();
-        lPlacar = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jPlacar = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -79,8 +81,25 @@ public class GamePanel extends javax.swing.JFrame {
         });
         getContentPane().add(bConectar);
         bConectar.setBounds(250, 20, 90, 30);
-        getContentPane().add(lPlacar);
-        lPlacar.setBounds(250, 406, 280, 40);
+
+        jPlacar.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        jPlacar.setCellSelectionEnabled(true);
+        jPlacar.setFocusable(false);
+        jScrollPane1.setViewportView(jPlacar);
+        jPlacar.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+
+        getContentPane().add(jScrollPane1);
+        jScrollPane1.setBounds(170, 380, 453, 80);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -92,53 +111,33 @@ public class GamePanel extends javax.swing.JFrame {
 
         if (evt.getKeyCode() == KeyEvent.VK_SPACE) {
 
-            player.punch();
-            int distanciaX = player.x - player2.x;
-            int distanciaY = player.y - player2.y;
-            if (distanciaX < 0) {
-                distanciaX = distanciaX * -1;
-            }
-            if (distanciaY < 0) {
-                distanciaY = distanciaY * -1;
-            }
-
-            if (distanciaX < 45 && distanciaY < 17) {
-                if(lastAction != GameProtocolActionType.PUNCH){
-                    player.points++;
-                    player2.punched();
-                        }
-            }
+       //     player.punch();
             type = GameProtocolActionType.PUNCH;
+
         } else if (evt.getKeyCode() == KeyEvent.VK_LEFT) {
 
-            player.moveLeft();
+       //     player.moveLeft();
             type = GameProtocolActionType.MOVE_LEFT;
         } else if (evt.getKeyCode() == KeyEvent.VK_RIGHT) {
 
-            player.moveRight();
+       //     player.moveRight();
             type = GameProtocolActionType.MOVE_RIGHT;
         } else if (evt.getKeyCode() == KeyEvent.VK_UP) {
 
-            player.moveUp();
+       //     player.moveUp();
             type = GameProtocolActionType.MOVE_UP;
         } else if (evt.getKeyCode() == KeyEvent.VK_DOWN) {
 
-            player.moveDown();
+      //      player.moveDown();
             type = GameProtocolActionType.MOVE_DOWN;
         }
         
-        lastAction = type;
         actionMng.sendAction(player.x, player.y, type);
 
     }//GEN-LAST:event_formKeyPressed
 
     private void formKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
-
-       if(player2.wasPunched)
-          player2.stand(); 
-        
-        player.stand();
-        lastAction =  GameProtocolActionType.STAND;
+ 
         actionMng.sendAction(player.x, player.y, GameProtocolActionType.STAND);
     }//GEN-LAST:event_formKeyReleased
 
@@ -154,15 +153,10 @@ public class GamePanel extends javax.swing.JFrame {
         getContentPane().remove(bConectar);
         player = new Player();
         player.setup();
-        player2 = new Player();
-        player2.setup();
         player.grabFocus();
-        actionMng = new ActionManagement(jHost.getText(), Integer.parseInt(jPorta.getText()), player, player2);
+        actionMng = new ActionManagement(jHost.getText(), Integer.parseInt(jPorta.getText()), player, jPlacar,getContentPane());
         actionMng.iniciar();
         getContentPane().add(player);
-        getContentPane().add(player2);
-        placar = new PlacarUpdate(player, player2, lPlacar);
-        new Thread(placar).start();
         repaint();
 
     }//GEN-LAST:event_bConectarActionPerformed
@@ -212,7 +206,8 @@ public class GamePanel extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bConectar;
     private javax.swing.JTextField jHost;
+    private javax.swing.JTable jPlacar;
     private javax.swing.JTextField jPorta;
-    private javax.swing.JLabel lPlacar;
+    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }

@@ -17,11 +17,13 @@ import java.io.Serializable;
  */
 public class GameProtocol implements Serializable {
     
+    private int id;
     private int x;
     private int y;
     private GameProtocolActionType actionType;
     
-    public GameProtocol(int x, int y, GameProtocolActionType actionType){
+    public GameProtocol(int id,int x, int y, GameProtocolActionType actionType){
+        this.id = id;
         this.x = x;
         this.y = y;
         this.actionType = actionType;
@@ -30,6 +32,19 @@ public class GameProtocol implements Serializable {
     /**
      * @return the x
      */
+    
+     public int getId() {
+        return id;
+    }
+
+    /**
+     * @param x the x to set
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+    
+    
     public int getX() {
         return x;
     }
@@ -69,5 +84,20 @@ public class GameProtocol implements Serializable {
         this.actionType = actionType;
     }
     
+    public boolean equals(Object obj){
+        if(!(obj instanceof ActionManagement))
+           return false;
+        GameProtocol prot = (GameProtocol) obj;
+        
+        return this.id == prot.id;
+           
+    }
+    
+    @Override
+     public String toString(){
+         
+         String str = id+";"+x+";"+y+";"+actionType.name();
+         return str;
+     }
     
 }
