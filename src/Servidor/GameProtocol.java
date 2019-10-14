@@ -21,12 +21,14 @@ public class GameProtocol implements Serializable {
     private int x;
     private int y;
     private GameProtocolActionType actionType;
+    private int points = 0;
     
-    public GameProtocol(int id,int x, int y, GameProtocolActionType actionType){
+    public GameProtocol(int id,int x, int y, GameProtocolActionType actionType, int points){
         this.id = id;
         this.x = x;
         this.y = y;
         this.actionType = actionType;
+        this.points = points;
     }
 
     /**
@@ -84,6 +86,21 @@ public class GameProtocol implements Serializable {
         this.actionType = actionType;
     }
     
+    /**
+     * @return the points
+     */
+    public int getPoints() {
+        return points;
+    }
+
+    /**
+     * @param points the points to set
+     */
+    public void setPoints(int points) {
+        this.points = points;
+    }
+    
+    
     public boolean equals(Object obj){
         if(!(obj instanceof ActionManagement))
            return false;
@@ -96,8 +113,8 @@ public class GameProtocol implements Serializable {
     @Override
      public String toString(){
          
-         String str = id+";"+x+";"+y+";"+actionType.name();
+         String str = id+";"+x+";"+y+";"+actionType.name()+";"+points;
          return str;
      }
-    
+
 }

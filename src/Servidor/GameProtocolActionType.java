@@ -12,7 +12,7 @@ package Servidor;
  */
 public enum GameProtocolActionType {
     
-    MOVE_UP(1), MOVE_DOWN(2), MOVE_LEFT(3), MOVE_RIGHT(4), PUNCH(5), STAND(6);
+    MOVE_UP(1), MOVE_DOWN(2), MOVE_LEFT(3), MOVE_RIGHT(4), PUNCH_RIGHT(5), STAND_RIGHT(6), PUNCH_LEFT(7), STAND_LEFT(8);
 
      private final int valor;
     

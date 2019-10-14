@@ -17,28 +17,26 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-
 /**
  *
  * @author guilherme.behs
  */
 public class ActionManagement implements Runnable {
-    
+
     BufferedReader in;
     PrintWriter out;
     Socket s;
     Player player;
-    List<Player> otherPlayers;
+    List<Player> players;
     Thread thPlayer;
     GameProtocolActionType player2lastAction;
     Container content;
     JTable placar;
-    
-    
-    public ActionManagement(String host, int porta, Player player, JTable placar, Container content){
+
+    public ActionManagement(String host, int porta, Player player, JTable placar, Container content) {
         try {
             this.player = player;
-            otherPlayers = new ArrayList();
+            players = new ArrayList();
             s = new Socket(host, porta);
             in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             out = new PrintWriter(s.getOutputStream());
@@ -46,146 +44,157 @@ public class ActionManagement implements Runnable {
             this.placar = placar;
             String id = in.readLine().split(":")[1];
             player.setId(Integer.parseInt(id));
-            otherPlayers.add(player);
-            sendAction(player.getX(), player.getY(), GameProtocolActionType.STAND);
+            players.add(player);
+            sendAction(player.getX(), player.getY(), GameProtocolActionType.STAND_RIGHT, 0);
             refreshScore();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
-    public void sendAction (int x, int y, GameProtocolActionType actionType){
-        GameProtocol prot = new GameProtocol(player.getId(),x,y,actionType);
+
+    public void sendAction(int x, int y, GameProtocolActionType actionType, int points) {
+        GameProtocol prot = new GameProtocol(player.getId(), x, y, actionType, points);
         String protStr = prot.toString();
         out.println(protStr);
         out.flush();
-     }
-    
-    public void receiveAction(){
+    }
+
+    public void receiveAction() {
         try {
             String msg;
-            while((msg = in.readLine()) != null){
-                
-               if(msg.equals("newPlayerAlert")){
-                  sendAction(player.getX(), player.getY(), player.getLastAction()); 
-               } 
-               else{
-               boolean encontrouPlayer = false;
-               String[] protArray =  msg.split(";");
-               int id = Integer.parseInt(protArray[0]);
-               int x = Integer.parseInt(protArray[1]);
-               int y = Integer.parseInt(protArray[2]);
-              
-               GameProtocolActionType action = GameProtocolActionType.valueOf(protArray[3]);
-               GameProtocol prot = new GameProtocol(id,x,y, action);
-               for(Player player: otherPlayers){
-                   if(player.getId() == prot.getId()){
-                     encontrouPlayer = true;  
-                     if(action == GameProtocolActionType.MOVE_UP){
+            while ((msg = in.readLine()) != null) {
+                if (msg.equals("newPlayerAlert")) {
+                    sendAction(player.getX(), player.getY(), player.getLastAction(), player.getPoints());
+                } else {
+                    System.out.println(msg);
+                    boolean encontrouPlayer = false;
+                    String[] protArray = msg.split(";");
+                    int id = Integer.parseInt(protArray[0]);
+                    int x = Integer.parseInt(protArray[1]);
+                    int y = Integer.parseInt(protArray[2]);
+
+                    GameProtocolActionType action = GameProtocolActionType.valueOf(protArray[3]);
+                    int points = Integer.parseInt(protArray[4]);
+
+                    GameProtocol prot = new GameProtocol(id, x, y, action, points);
+                    for (Player p : players) {
+                        if (p.getId() == prot.getId()) {
+                            encontrouPlayer = true;
+                            p.setX(x);
+                            p.setY(y);
+                            setAction(p, prot.getActionType());        
+                            break;
+                        }
+
+                    }
+                    if (!encontrouPlayer) {
+                        Player newPlayer = new Player();
+                        newPlayer.setup(prot.getX(), prot.getY());
+                        newPlayer.setId(prot.getId());
+                        newPlayer.setPoints(points);
+                       setAction(newPlayer, prot.getActionType());
+                        players.add(newPlayer);
                    
-                   player.moveUp();
-               }
-               else if(action == GameProtocolActionType.MOVE_DOWN){
-                  player.moveDown();
-               }
-             else if(action == GameProtocolActionType.MOVE_LEFT){
-                  player.moveLeft();
-             }
-              else if(action == GameProtocolActionType.MOVE_RIGHT){
-                  player.moveRight();
-              }
-              else if(action == GameProtocolActionType.PUNCH){
-                  player.punch();
-                  validatePunch(player);
+                        content.add(newPlayer);
+                        refreshScore();
+                        
+                    }
                 }
-              else if(action == GameProtocolActionType.STAND){
-                     player.stand();
-                     restoreFromPunch(player);
-              }                                   
-                 break;
-               }
-             
-            }
-             if(!encontrouPlayer){
-                 Player newPlayer = new Player();
-                 newPlayer.setId(prot.getId());
-                 newPlayer.setup(prot.getX(), prot.getY());
-                 otherPlayers.add(newPlayer);
-                 content.add(newPlayer);
-                 refreshScore();
-             }
-          }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-  }
+    }
 
-    public void iniciar(){
+    public void iniciar() {
         thPlayer = new Thread(this);
         thPlayer.start();
     }
-    
-    public void restoreFromPunch(Player player){
-        
-          for(Player p: otherPlayers){
-             if(p.getIdPlayerPunch() == player.getId()){
+
+    public void restoreFromPunch(Player player) {
+
+        for (Player p : players) {
+            if (p.getIdPlayerPunch() == player.getId()) {
                 p.stand();
-             }
-               
-         }
-        
+            }
+
+        }
+
     }
-    
-    
-    public void validatePunch(Player player){
-     
-         for(Player p: otherPlayers){
-             if(p.getId() != player.getId()){
-                 int x1 = p.getX();
-                 int x2 = player.getX();
-                 int y1 = p.getY();
-                 int y2 = player.getY();
-                 int diferencaX = x1 - x2;
-                 int diferencaY = y1 - y2;
-                 diferencaX = diferencaX < 0? (diferencaX * -1) : diferencaX;
-                 diferencaY = diferencaY < 0? (diferencaY * -1) : diferencaY;
-                 
-                 if(diferencaX < 30 && diferencaY < 30){
+
+    public void validatePunch(Player player) {
+
+        for (Player p : players) {
+            if (p.getId() != player.getId()) {
+                int x1 = p.getX();
+                int x2 = player.getX();
+                int y1 = p.getY();
+                int y2 = player.getY();
+                int diferencaX = x1 - x2;
+                int diferencaY = y1 - y2;
+                diferencaX = diferencaX < 0 ? (diferencaX * -1) : diferencaX;
+                diferencaY = diferencaY < 0 ? (diferencaY * -1) : diferencaY;
+
+                if (diferencaX < 30 && diferencaY < 30) {
                     player.setPoints(player.getPoints() + 1);
                     p.punched(player.getId());
                     refreshScore();
-                 }
-                 
-             }
-         }
-         
+                }
+
+            }
+        }
+
     }
-    
-    public void refreshScore(){
-       DefaultTableModel model = new DefaultTableModel(){
+
+    public void refreshScore() {
+        DefaultTableModel model = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
-       //all cells false
-            return false;
-    }
-       };
-       
-       model.addColumn("Player");
-       model.addColumn("Pontuação");
-        for(Player p: otherPlayers){
+                return false;
+            }
+        };
+
+        model.addColumn("Player");
+        model.addColumn("Pontuação");
+        for (Player p : players) {
             model.addRow(new Object[]{p.getId(), p.getPoints()});
-         }
+        }
         placar.setModel(model);
         placar.setFocusable(false);
 
     }
-    
+
+    public void setAction(Player p, GameProtocolActionType action) {
+        
+        if (action == GameProtocolActionType.MOVE_UP) {
+
+            p.moveUp();
+        } else if (action == GameProtocolActionType.MOVE_DOWN) {
+            p.moveDown();
+        } else if (action == GameProtocolActionType.MOVE_LEFT) {
+            p.moveLeft();
+        } else if (action == GameProtocolActionType.MOVE_RIGHT) {
+            p.moveRight();
+        } else if (action == GameProtocolActionType.PUNCH_LEFT) {
+            p.punchLeft();
+            validatePunch(p);
+        } else if (action == GameProtocolActionType.PUNCH_RIGHT) {
+            p.punchRight();
+            validatePunch(p);
+        } else if (action == GameProtocolActionType.STAND_LEFT) {
+            p.standLeft();
+            restoreFromPunch(p);
+        } else if (action == GameProtocolActionType.STAND_RIGHT) {
+            p.standRight();
+            restoreFromPunch(p);
+        }
+
+    }
+
     @Override
     public void run() {
-      receiveAction();
+        receiveAction();
     }
 }
-
 
 

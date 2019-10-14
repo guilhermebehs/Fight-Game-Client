@@ -108,37 +108,34 @@ public class GamePanel extends javax.swing.JFrame {
         // TODO add your handling code here:
 
         GameProtocolActionType type = null;
-
         if (evt.getKeyCode() == KeyEvent.VK_SPACE) {
-
-       //     player.punch();
-            type = GameProtocolActionType.PUNCH;
+            if(player.toTheLeft)
+               type =  GameProtocolActionType.PUNCH_LEFT;
+            else
+               type =  GameProtocolActionType.PUNCH_RIGHT; 
 
         } else if (evt.getKeyCode() == KeyEvent.VK_LEFT) {
 
-       //     player.moveLeft();
+            player.moveLeft();
             type = GameProtocolActionType.MOVE_LEFT;
         } else if (evt.getKeyCode() == KeyEvent.VK_RIGHT) {
 
-       //     player.moveRight();
             type = GameProtocolActionType.MOVE_RIGHT;
         } else if (evt.getKeyCode() == KeyEvent.VK_UP) {
 
-       //     player.moveUp();
             type = GameProtocolActionType.MOVE_UP;
         } else if (evt.getKeyCode() == KeyEvent.VK_DOWN) {
 
-      //      player.moveDown();
             type = GameProtocolActionType.MOVE_DOWN;
         }
         
-        actionMng.sendAction(player.getX(), player.getY(), type);
+        actionMng.sendAction(player.getX(), player.getY(), type, player.getPoints());
 
     }//GEN-LAST:event_formKeyPressed
 
     private void formKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
  
-        actionMng.sendAction(player.getX(), player.getY(), GameProtocolActionType.STAND);
+        actionMng.sendAction(player.getX(), player.getY(), player.toTheLeft ? GameProtocolActionType.STAND_LEFT: GameProtocolActionType.STAND_RIGHT, player.getPoints());
     }//GEN-LAST:event_formKeyReleased
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
@@ -152,6 +149,7 @@ public class GamePanel extends javax.swing.JFrame {
         getContentPane().remove(jPorta);
         getContentPane().remove(bConectar);
         player = new Player();
+        player.setup(10, 10);
         player.grabFocus();
         actionMng = new ActionManagement(jHost.getText(), Integer.parseInt(jPorta.getText()), player, jPlacar,getContentPane());
         actionMng.iniciar();

@@ -23,7 +23,7 @@ public class Player extends JLabel{
     private int x = 50;
     private int y = 50;
     private int id;
-    private GameProtocolActionType lastAction = GameProtocolActionType.STAND;
+    private GameProtocolActionType lastAction = GameProtocolActionType.STAND_RIGHT;
     private ImageIcon lastImage;
     private ImageIcon walkR;
     private ImageIcon standR;
@@ -35,73 +35,80 @@ public class Player extends JLabel{
     private ImageIcon punchedL;
     private boolean wasPunched = false;
     private int idPlayerPunch;
-    private int points = 0;
-    
+    private int points = 0;    
+    private int width = 95;
+    private int height = 140;
+    public boolean toTheLeft = false; 
     
     public Player(){
-        setWalkR(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/walk.gif")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT))); 
-        setStandR(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/stand.gif")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT))); 
-        setPunchR(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/punch.png")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT)));
-        setPunchedR(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/punched.png")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT)));
-         setWalkL(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/walk inverse.gif")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT))); 
-        setStandL(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/stand inverse.gif")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT))); 
-        setPunchL(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/punch inverse.png")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT))); 
-        setPunchedL(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/punched inverse.png")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT)));
-        setIcon(getStandR());
-        setLastImage(getStandR());
-        setBounds(getX(), getY(), 90, 127);
+      
     }
     
     public void setup(int x, int y){
         this.setX(x);
         this.setY(y);
-        setWalkR(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/walk.gif")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT))); 
-        setStandR(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/stand.gif")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT))); 
-        setPunchR(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/punch.png")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT)));
-        setPunchedR(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/punched.png")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT)));
-         setWalkL(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/walk inverse.gif")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT))); 
-        setStandL(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/stand inverse.gif")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT))); 
-        setPunchL(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/punch inverse.png")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT))); 
-        setPunchedL(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/punched inverse.png")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT)));
+        setWalkR(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/walk.gif")).getImage().getScaledInstance(width, height-20, Image.SCALE_DEFAULT))); 
+        setStandR(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/stand.gif")).getImage().getScaledInstance(width, height-20, Image.SCALE_DEFAULT))); 
+        setPunchR(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/punch.png")).getImage().getScaledInstance(width, height-20, Image.SCALE_DEFAULT)));
+        setPunchedR(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/punched.png")).getImage().getScaledInstance(width, height-20, Image.SCALE_DEFAULT)));
+        setWalkL(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/walk inverse.gif")).getImage().getScaledInstance(width, height-20, Image.SCALE_DEFAULT))); 
+        setStandL(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/stand inverse.gif")).getImage().getScaledInstance(width, height-20, Image.SCALE_DEFAULT))); 
+        setPunchL(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/punch inverse.png")).getImage().getScaledInstance(width, height-20, Image.SCALE_DEFAULT))); 
+        setPunchedL(new ImageIcon(new ImageIcon(getClass().getResource("/imgs/punched inverse.png")).getImage().getScaledInstance(width, height-20, Image.SCALE_DEFAULT)));
         setIcon(getStandR());
         setLastImage(getStandR());
-        setBounds(x, y, 90, 127);
+        setBounds(x, y,width, height);
     }
     
     public void moveLeft(){
         setX(getX() - 1);
         setLastImage(getWalkL());
-     setIcon(getWalkL());
-     setBounds(getX(), getY(), 90, 127);
+        setIcon(getWalkL());
+       setBounds(getX(), getY(), width, height);
         setLastAction(GameProtocolActionType.MOVE_LEFT);
+        toTheLeft = true;
     }
     
      public void moveRight(){
         setX(getX() + 1); 
         setLastImage(getWalkR());
         setIcon(getWalkR());
-        setBounds(getX(), getY(), 90, 127);
+        setBounds(getX(), getY(), width, height);
         setLastAction(GameProtocolActionType.MOVE_RIGHT);
+        toTheLeft = false;
     }
      
     public void moveUp(){
         setY(getY() - 1);
-        setBounds(getX(), getY(), 90, 127);
+        setBounds(getX(), getY(), width, height);
         setLastAction(GameProtocolActionType.MOVE_UP);
     }
     
     public void moveDown(){
          setY(getY() + 1);
-        setBounds(getX(), getY(), 90, 127);
+        setBounds(getX(), getY(), width, height);
           setLastAction(GameProtocolActionType.MOVE_DOWN);
     }
     
+    
     public void punch(){
       if(getLastImage() == getWalkR() || getLastImage() == getStandR() || getLastImage() == getPunchR() || getLastImage() == getPunchedR())
-         setIcon(getPunchR());
+         punchRight(); 
       else
-         setIcon(getPunchL()); 
-        setLastAction(GameProtocolActionType.PUNCH);
+         punchLeft(); 
+        
+    }
+    
+    public void punchLeft(){
+      setIcon(getPunchL());
+      setLastAction(GameProtocolActionType.PUNCH_LEFT);
+      toTheLeft = true;
+    }
+    
+    public void punchRight(){
+       setIcon(getPunchR());
+      setLastAction(GameProtocolActionType.PUNCH_RIGHT);
+      toTheLeft = false;
     }
     
     public void punched(int id){
@@ -109,17 +116,36 @@ public class Player extends JLabel{
          setIcon(getPunchedR());
       else
          setIcon(getPunchedL()); 
+         setBounds(getX(), getY(), width, height);
         setIdPlayerPunch(id);
         setWasPunched(true);
+        
     }
     
     public void stand(){
+        
       if(getLastImage() == getWalkR() || getLastImage() == getStandR() || getLastImage() == getPunchR() || getLastImage() == getPunchedR())
-            setIcon(getStandR());
+            standRight();
           else
-            setIcon(getStandL());
-         setWasPunched(false);
-         setLastAction(GameProtocolActionType.STAND);
+            standLeft();
+        
+    }
+    
+    public void standLeft(){
+        toTheLeft = true;
+     setWasPunched(false);
+      setIcon(getStandL());
+      setLastAction(GameProtocolActionType.STAND_LEFT);
+      setBounds(getX(), getY(), width, height); 
+
+    }
+    
+    public void standRight(){
+      toTheLeft = false;  
+      setWasPunched(false);  
+      setIcon(getStandR());
+      setLastAction(GameProtocolActionType.STAND_RIGHT);
+      setBounds(getX(), getY(), width, height); 
     }
 
     /**
@@ -162,6 +188,10 @@ public class Player extends JLabel{
      */
     public void setId(int id) {
         this.id = id;
+         setText(String.valueOf(id));
+        setHorizontalTextPosition(JLabel.CENTER);
+        setVerticalTextPosition(JLabel.BOTTOM); 
+
     }
 
     /**
