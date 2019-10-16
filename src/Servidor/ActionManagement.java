@@ -124,6 +124,7 @@ public class ActionManagement implements Runnable {
 
     public void validatePunch(Player player) {
 
+        if(player.getLastAction() != GameProtocolActionType.PUNCH_LEFT && player.getLastAction() != GameProtocolActionType.PUNCH_RIGHT)
         for (Player p : players) {
             if (p.getId() != player.getId()) {
                 int x1 = p.getX();
@@ -176,11 +177,11 @@ public class ActionManagement implements Runnable {
         } else if (action == GameProtocolActionType.MOVE_RIGHT) {
             p.moveRight();
         } else if (action == GameProtocolActionType.PUNCH_LEFT) {
+            validatePunch(p);
             p.punchLeft();
-            validatePunch(p);
         } else if (action == GameProtocolActionType.PUNCH_RIGHT) {
+            validatePunch(p); 
             p.punchRight();
-            validatePunch(p);
         } else if (action == GameProtocolActionType.STAND_LEFT) {
             p.standLeft();
             restoreFromPunch(p);

@@ -2,6 +2,7 @@ package Tela;
 
 
 import Servidor.GameProtocolActionType;
+import java.awt.Font;
 import java.awt.Image;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -191,6 +192,8 @@ public class Player extends JLabel{
          setText(String.valueOf(id));
         setHorizontalTextPosition(JLabel.CENTER);
         setVerticalTextPosition(JLabel.BOTTOM); 
+        Font font = new Font("Courier", Font.BOLD,12);
+        setFont(font);
 
     }
 
